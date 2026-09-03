@@ -1,0 +1,60 @@
+# Dependencies and build output
+node_modules/
+dist/
+.vite/
+coverage/
+*.tsbuildinfo
+
+# Local environment files
+.env
+.env.*
+!.env.example
+*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*Zone.Identifier
+
+# Images and image-based reference files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.bmp
+*.tif
+*.tiff
+*.svg
+*.ico
+
+# Keep images that are part of the published application
+!public/**/*.png
+!public/**/*.jpg
+!public/**/*.jpeg
+!public/**/*.gif
+!public/**/*.webp
+!public/**/*.bmp
+!public/**/*.tif
+!public/**/*.tiff
+!public/**/*.svg
+!public/**/*.ico
+!src/assets/**/*.png
+!src/assets/**/*.jpg
+!src/assets/**/*.jpeg
+!src/assets/**/*.gif
+!src/assets/**/*.webp
+!src/assets/**/*.bmp
+!src/assets/**/*.tif
+!src/assets/**/*.tiff
+!src/assets/**/*.svg
+!src/assets/**/*.ico

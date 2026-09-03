@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="ブラウザで使えるGISユーティリティ集" />
+    <title>WebGIS Tools</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      (function (location) {
+        if (location.search.slice(0, 2) === "?/") {
+          var route = location.search.slice(2).split("&")[0].replace(/~and~/g, "&");
+          window.history.replaceState(null, "", location.pathname + route + location.hash);
+        }
+      })(window.location);
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
