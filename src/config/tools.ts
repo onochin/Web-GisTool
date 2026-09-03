@@ -27,4 +27,13 @@ export const TOOLS: readonly ToolDefinition[] = [
     icon: "ⓘ",
     enabled: true,
   },
+  {
+    id: "vector-converter",
+    name: "ベクター変換",
+    description: "GeoJSON・KML・Shapefile・GeoPackageをブラウザ内で相互変換します。",
+    category: "データ変換",
+    route: "/vector-converter",
+    icon: "⇆",
+    enabled: true,
+  },
 ];

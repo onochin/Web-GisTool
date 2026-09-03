@@ -1,6 +1,6 @@
 # WebGIS Tools
 
-ブラウザだけで利用できるGISユーティリティ集です。トップページをダッシュボードとし、座標・測地、ベクタ処理、空間解析、データ確認、WebMapなどのツールを段階的に追加できる構成を目指します。座標変換とGISファイル情報確認を提供します。
+ブラウザだけで利用できるGISユーティリティ集です。トップページをダッシュボードとし、座標・測地、ベクタ処理、空間解析、データ確認、WebMapなどのツールを段階的に追加できる構成を目指します。座標変換、GISファイル情報確認、ベクターファイル変換を提供します。
 
 ## 使用技術
 
@@ -8,8 +8,25 @@
 - proj4（Proj4js）
 - React Router
 - Vitest
+- @ngageoint/geopackage（GeoPackage / SQL.js WASM）
+- shpjs / fflate（Shapefile読込 / ZIP処理）
 
 座標値は外部へ送信せず、変換処理はブラウザ内で完結します。
+
+## ベクター変換
+
+`/vector-converter` でGeoJSON、KML、Shapefile ZIP、GeoPackageを相互変換します。ファイル内容から形式を判定し、GeoPackageまたは複数Shapefileを含むZIPでは、変換するVectorレイヤーを1つ選択できます。入力と同じ形式は出力候補から除外されます。
+
+- GeoJSON / KML出力はWGS84（経度・緯度）へ変換
+- Shapefile / GeoPackage出力は入力CRSを原則維持
+- 座標変換が必要なのにCRSを判定できない場合だけ、入力EPSGの指定が必要
+- Shapefile出力は`.shp`、`.shx`、`.dbf`、`.cpg`と、CRS判明時の`.prj`をZIP化
+- GeoPackageはVector Feature Tableのみを対象とし、1回につき1レイヤーを出力
+- 最大入力サイズは100MB（Shapefile ZIPは展開後250MBまで）
+
+処理とダウンロードはブラウザ内で完結し、入力ファイルをサーバーへ送信しません。GeoPackage機能を初めて使うときだけ、約1.10MBのライブラリと約631KBのWASM assetを遅延読込します。
+
+制約として、Raster、GeoPackageのTile・Style・拡張、全レイヤー一括変換、Geometry編集には対応しません。Shapefileは1レイヤー1系統のGeometry、属性名10文字、DBF型などの制約があり、変更や情報損失の可能性を画面に警告します。GeometryCollectionはGeoJSON / KML / GeoPackageで扱えますが、Shapefile出力には対応しません。M値は判別できない形式があるため完全対応ではありません。
 
 ## GIS Info
 

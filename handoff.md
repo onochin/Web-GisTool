@@ -1,8 +1,8 @@
 # webgis-tools 引き継ぎ資料
 
-最終更新: 2026-09-03
+最終更新: 2026-09-04
 
-今回の更新: `doc/依頼03_座標変換ツールの修正.md` に基づくGIS InfoのCRS84判定改善を反映。
+今回の更新: `doc/依頼05_ベクターファイル変換ツール.md` に基づき、4形式のベクター相互変換を追加。
 
 ## 1. 現在の状態
 
@@ -11,6 +11,7 @@ Webブラウザ内でGISファイルの座標変換と基本情報確認を行�
 - `/`: WebGIS Tools Dashboard
 - `/coordinate`: ファイル用座標変換ツール
 - `/gis-info`: Vector / Raster基本情報確認ツール
+- `/vector-converter`: GeoJSON / KML / Shapefile ZIP / GeoPackage相互変換ツール
 - 変換画面は左側に「現在の座標系」「変換後の座標系」「出力」、右側にファイルドロップ領域を配置
 - 「変換を実行してダウンロード」で変換とダウンロードを連続実行
 - 元ファイルは上書きしない
@@ -27,6 +28,9 @@ Webブラウザ内でGISファイルの座標変換と基本情報確認を行�
 - React Router 7
 - Proj4js 2.19
 - Vitest 3
+- @ngageoint/geopackage 4.2.9（GeoPackage / SQL.js WASM）
+- shpjs 6.2.0（Shapefile読込）
+- fflate 0.8.3（ZIP入出力）
 
 主要コマンド:
 
@@ -130,6 +134,18 @@ GeoJSONはGIS標準の `[x, y]` 順として扱うため、平面直角座標で
 
 GeoTIFFは`Blob.slice()`を使い、IFDと必要なメタデータ範囲だけを読み込みます。GeoJSONとKMLは範囲・属性解析のためテキスト全体を読み込みます。
 
+## 5-3. ベクター変換仕様
+
+- 入出力: GeoJSON、KML、Shapefile ZIP、GeoPackage Vector Feature Table
+- 形式は拡張子だけでなく、JSON/XML、ZIP、SQLiteとGeoPackage application IDから判定
+- GeoPackageと複数Shapefile ZIPはレイヤー一覧を表示し、1回につき1レイヤーを変換
+- 共通Featureモデルを介し、GeoJSON / KMLはEPSG:4326、Shapefile / GeoPackageは入力CRSを原則維持
+- CRS変換には既存の`src/lib/coordinates/transform.ts`を再利用し、未知CRSをWGS84と仮定しない
+- Shapefile出力はSHP / SHX / DBF / CPGと、CRS判明時のPRJをZIP化。DBF制約による属性名変更等は警告
+- GeoPackage本体とSQL.js WASMはベクター変換ルートから遅延読込し、他ツールの初期bundleへ含めない
+- ブラウザ内で処理し、最大入力100MB、Shapefile展開後250MB
+- 未対応: Raster、GeoPackage Tile・Style・拡張、全レイヤー一括変換、ShapefileへのGeometryCollection・M値出力
+
 ### CRS84正規化の重要仕様
 
 次の表記はすべて内部で`OGC:CRS84`へ正規化します。
@@ -172,6 +188,12 @@ CRS84はEPSGコードではないため、`epsg`は`null`、`equivalentEpsg`は`
 | `src/lib/gis/geotiff.ts` | GeoTIFFのIFD / GeoKey / 範囲解析 |
 | `src/lib/gis/types.ts` | 再利用可能なGIS解析結果型 |
 | `src/lib/crs/metadata.ts` | CRS alias正規化、明示情報・形式推定、CRS軸順・データ順の分離 |
+| `src/pages/VectorConverter/VectorConverter.tsx` | ベクター変換の解析・設定・ダウンロードUI |
+| `src/lib/vector/converter.ts` | 内容判定、レイヤー解析、形式変換の統括 |
+| `src/lib/vector/types.ts` | Raster追加を見越した共通Vectorデータモデル |
+| `src/lib/vector/geojson.ts` / `kml.ts` | GeoJSON / KML入出力 |
+| `src/lib/vector/shapefile.ts` | Shapefile ZIP入出力とDBF制約警告 |
+| `src/lib/vector/geopackage.ts` | GeoPackage Vector Feature Table入出力 |
 | `src/config/tools.ts` | Dashboardのツール定義 |
 | `src/styles.css` | Dashboardと座標変換画面のスタイル |
 | `public/404.html` | GitHub Pages用SPAフォールバック |
@@ -183,8 +205,8 @@ CRS84はEPSGコードではないため、`epsg`は`null`、`equivalentEpsg`は`
 直近の結果:
 
 ```text
-Test Files  4 passed (4)
-Tests       41 passed (41)
+Test Files  5 passed (5)
+Tests       67 passed (67)
 vite build  success
 ```
 
@@ -194,6 +216,7 @@ vite build  success
 - `src/lib/files/coordinateFile.test.ts`
 - `src/lib/gis/gisInfo.test.ts`
 - `src/lib/crs/metadata.test.ts`
+- `src/lib/vector/vectorConverter.test.ts`
 
 確認対象:
 
@@ -208,8 +231,9 @@ vite build  success
 - CRS84の短縮表記・URN表記、EPSG:4326との軸順分離、未知CRSの非推定
 - GeoTIFFのサイズ、バンド、Data Type、NoData、CRSあり・なし、Bounding Box
 - 不正ファイルと未対応形式
+- 4形式間の異なる全12変換ペア、基本Geometry 6種、日本語属性、CRS維持・変換・未知CRS
 
-KML変換はブラウザの `DOMParser` を使用します。現在のVitest環境はNodeのため、KMLの自動テストは未追加です。次にテストを強化する場合は、ブラウザテストを追加するか、XML部分をDOM非依存に分離してください。
+KML変換はDOM非依存のXML処理として単体テストしています。ドラッグ＆ドロップとブラウザダウンロードのE2Eテストは未追加です。
 
 ## 8. 既知の制約・注意点
 
@@ -222,6 +246,7 @@ KML変換はブラウザの `DOMParser` を使用します。現在のVitest環�
 - KMLの高度な拡張要素とGeoJSONのM座標判別に未対応
 - 保存場所の指定はアプリではなくブラウザ設定に委ねる
 - 「変換を実行してダウンロード」時に同名ファイルがある場合の扱いはブラウザ依存
+- GeoPackage利用時は遅延読込assetとしてライブラリ約1.10MBとSQL.js WASM約631KBが追加で必要
 
 ## 9. 今後の拡張候補
 
@@ -244,6 +269,6 @@ npm run build -- --mode github-pages
 
 GitHubリポジトリは`onochin/Web-GisTool`です。`main`ブランチへのpushで`.github/workflows/deploy.yml`が`dist`をGitHub Pagesへ自動デプロイします。Pages Sourceは「GitHub Actions」を使用します。
 
-`vite.config.ts`のPages用baseは大文字小文字を含めて`/Web-GisTool/`です。`public/404.html`と`index.html`の退避・復元処理により、`/coordinate`と`/gis-info`への直接アクセスをBrowserRouterへ戻します。リポジトリ名を変更する場合はbaseも合わせて変更してください。
+`vite.config.ts`のPages用baseは大文字小文字を含めて`/Web-GisTool/`です。`public/404.html`と`index.html`の退避・復元処理により、`/coordinate`、`/gis-info`、`/vector-converter`への直接アクセスをBrowserRouterへ戻します。リポジトリ名を変更する場合はbaseも合わせて変更してください。
 
 `.gitignore`では画像を原則除外し、公開サイトで使う`public/`配下と`src/assets/`配下の画像だけを例外としてGit管理します。参考画像は`ref/`に置くと除外対象のままです。
