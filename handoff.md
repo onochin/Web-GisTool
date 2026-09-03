@@ -239,9 +239,11 @@ CRSを追加する場合は、`definitions.ts`へ定義を追加し、一次資�
 Pages用ビルド:
 
 ```bash
-npm run build:pages
+npm run build -- --mode github-pages
 ```
 
-`vite.config.ts` のPages用baseは `/webgis-tools/` です。リポジトリ名を変更する場合は、同ファイルのbaseと `public/404.html` のルーティング設定を合わせて変更してください。
+GitHubリポジトリは`onochin/Web-GisTool`です。`main`ブランチへのpushで`.github/workflows/deploy.yml`が`dist`をGitHub Pagesへ自動デプロイします。Pages Sourceは「GitHub Actions」を使用します。
+
+`vite.config.ts`のPages用baseは大文字小文字を含めて`/Web-GisTool/`です。`public/404.html`と`index.html`の退避・復元処理により、`/coordinate`と`/gis-info`への直接アクセスをBrowserRouterへ戻します。リポジトリ名を変更する場合はbaseも合わせて変更してください。
 
 `.gitignore`では画像を原則除外し、公開サイトで使う`public/`配下と`src/assets/`配下の画像だけを例外としてGit管理します。参考画像は`ref/`に置くと除外対象のままです。

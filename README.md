@@ -51,13 +51,13 @@ npm test
 npm run build
 ```
 
-GitHub Pages向け（リポジトリ名 `webgis-tools`）には次を使用します。
+GitHub Pages向け（リポジトリ `onochin/Web-GisTool`）には次を使用します。
 
 ```bash
-npm run build:pages
+npm run build -- --mode github-pages
 ```
 
-`public/404.html` は、React Routerの直接URLをGitHub PagesからSPAへ戻すためのフォールバックです。リポジトリ名を変える場合は `vite.config.ts` の `base` と `public/404.html` の `segmentsToKeep` を合わせて変更してください。
+`main`ブランチへpushすると、`.github/workflows/deploy.yml`がビルドした`dist`をGitHub Pagesへ自動デプロイします。`public/404.html`は、React Routerの直接URLをGitHub PagesからSPAへ戻すためのフォールバックです。リポジトリ名を変える場合は`vite.config.ts`の`base`（現在は`/Web-GisTool/`）も変更してください。
 
 ## 座標変換ツール
 
