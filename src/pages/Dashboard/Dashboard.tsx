@@ -11,13 +11,10 @@ export function Dashboard() {
         <h1>GIS作業を、ブラウザでもっと手軽に。</h1>
         <p>日常の座標・測地処理を、インストール不要で安全に実行できるユーティリティ集です。</p>
       </section>
-      <section className="preview-map" aria-labelledby="preview-map-title">
-        <div className="preview-map-heading">
-          <div><span>試作機能</span><h2 id="preview-map-title">確認用マップ</h2></div>
-          <a href={previewMapUrl} target="_blank" rel="noopener noreferrer">別タブで開く <span aria-hidden="true">↗</span></a>
-        </div>
-        <iframe src={previewMapUrl} title="確認用マップ" loading="lazy" />
-      </section>
+      <p className="preview-map-link">
+        <span>試作機能</span>
+        <a href={previewMapUrl} target="_blank" rel="noopener noreferrer">確認用マップを開く <span aria-hidden="true">↗</span></a>
+      </p>
       <section aria-labelledby="tools-title">
         <div className="section-heading">
           <div><p className="eyebrow">AVAILABLE TOOLS</p><h2 id="tools-title">利用可能なツール</h2></div>
