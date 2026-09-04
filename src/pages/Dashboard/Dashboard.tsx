@@ -13,7 +13,7 @@ export function Dashboard() {
       </section>
       <p className="preview-map-link">
         <span>試作機能</span>
-        <a href={previewMapUrl} target="_blank" rel="noopener noreferrer">確認用マップを開く <span aria-hidden="true">↗</span></a>
+        <a href={previewMapUrl} target="_blank" rel="noopener noreferrer">確認用マップを開く</a>
       </p>
       <section aria-labelledby="tools-title">
         <div className="section-heading">

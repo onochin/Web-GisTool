@@ -37,7 +37,7 @@ a { color: inherit; }
 .hero > p:last-child, .page-header > p:last-child { max-width: 700px; color: var(--muted); line-height: 1.9; }
 .preview-map-link { display: flex; align-items: center; gap: 10px; margin: -48px 0 64px; color: var(--muted); font-size: 13px; }
 .preview-map-link > span { padding: 3px 7px; border-radius: 5px; background: #e9efef; font-size: 10px; font-weight: 600; }
-.preview-map-link a { color: var(--green-dark); font-weight: 700; text-underline-offset: 3px; }
+.preview-map-link a { color: var(--green-dark); font-size: 16px; font-weight: 700; text-underline-offset: 3px; }
 .preview-map-link a:hover { color: var(--green); }
 .section-heading, .workspace-title, .subheading, .batch-actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .section-heading h2, .workspace-title h2 { margin: 0; color: var(--navy); font-size: 24px; }
